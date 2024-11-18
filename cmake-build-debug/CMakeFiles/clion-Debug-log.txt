@@ -7,19 +7,7 @@ CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
   CMake that the project does not need compatibility with older versions.
 
 
--- The C compiler identification is GNU 13.1.0
--- The CXX compiler identification is GNU 13.1.0
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Check for working C compiler: D:/CLion/CLion 2024.2.0.1/bin/mingw/bin/gcc.exe - skipped
--- Detecting C compile features
--- Detecting C compile features - done
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: D:/CLion/CLion 2024.2.0.1/bin/mingw/bin/g++.exe - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
 -- Found SFML 2.5.1 in C:/Users/jaden/Desktop/Project 3 - Minesweeper Spring 2024/SFML-2.5.1/lib/cmake/SFML
--- Configuring done (3.8s)
+-- Configuring done (0.7s)
 -- Generating done (0.0s)
 -- Build files have been written to: C:/Users/jaden/Desktop/Project 3 - Minesweeper Spring 2024/files/cmake-build-debug
