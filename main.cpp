@@ -74,7 +74,7 @@ int main() {
 
         setText(welcomeText, (width / 2), float((height / 2) - 150));
         setText(instructionText, (width / 2), float((height / 2) - 75));
-        setText(usernameText, (width / 2), float((height / 2) - 45));
+        // setText(usernameText, (width / 2), float((height / 2) - 45));
 
         while(welcomeWindow.pollEvent(textEvent)) {
             if(textEvent.type == sf::Event::Closed) {
@@ -86,19 +86,32 @@ int main() {
                     if(textEvent.text.unicode == 8 && nameInput.size() != 0) {
                         nameInput.pop_back();
                     }
+                    else if(textEvent.text.unicode == '\r' && nameInput.size() > 0) {
+                        // close welcome window, open game window
+                        welcomeWindow.close();
+                        break;
+                    }
                     else {
-                        nameInput += static_cast<char>(textEvent.text.unicode);
-                        std::cout << nameInput << std::endl;
+                        if(std::isalpha(textEvent.text.unicode) && nameInput.size() < 10) {
+                            if(nameInput.size() == 0) {
+                                nameInput += std::toupper(static_cast<char>(textEvent.text.unicode));
+                            }
+                            else if(nameInput.size() > 0) {
+                                nameInput += std::tolower(static_cast<char>(textEvent.text.unicode));
+                            }
+                            else {
+                                nameInput += static_cast<char>(textEvent.text.unicode);
+                                std::cout << nameInput << " " << nameInput.size() << std::endl;
+                            }
+                        }
                     }
                 }
 
-                else if(textEvent.text.unicode == '\r') {
-                    // close welcome window, open game window
-                    break;
-                }
             }
         }
         usernameText.setString(nameInput + '|');
+        setText(usernameText, (width / 2), float((height / 2) - 45));
+
 
 
         // welcomeText.setString()
