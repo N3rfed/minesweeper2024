@@ -4,5 +4,11 @@
 
 #ifndef MINESWEEPER_H
 #define MINESWEEPER_H
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <algorithm>
 
 #endif //MINESWEEPER_H
+
+
