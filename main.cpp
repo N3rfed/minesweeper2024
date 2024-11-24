@@ -24,12 +24,7 @@ void runWelcomeScreen(int& width, int& height, int& mine_count) {
     font.loadFromFile("font.ttf");
     std::string nameInput;
     while(welcomeWindow.isOpen()) {
-        sf::Event event;
-        while(welcomeWindow.pollEvent(event)) {
-            if(event.type == sf::Event::Closed) {
-                welcomeWindow.close();
-            }
-        }
+
 
         welcomeWindow.clear(welcomeBackground);
         sf::Text welcomeText;
@@ -94,7 +89,6 @@ void runWelcomeScreen(int& width, int& height, int& mine_count) {
                         }
                     }
                 }
-
             }
         }
         usernameText.setString(nameInput + '|');
