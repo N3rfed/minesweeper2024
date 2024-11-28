@@ -1,19 +1,9 @@
 # ninja log v6
-16	1551	7541347597505714	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
-1552	1847	7541347612858585	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
-32	313	7536635512664228	CMakeFiles/jaden_delapaz_minesweeper.dir/minesweeper.cpp.obj	4e63e997a0b49f2b
-50	348	7541352461039586	CMakeFiles/jaden_delapaz_minesweeper.dir/minesweeper.cpp.obj	4e63e997a0b49f2b
-27	2022	7541352460814315	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
-2023	2535	7541352480763108	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
-22	1854	7541360872430988	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
-1856	2150	7541360890761993	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
-18	1522	7541362161622275	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
-1523	1818	7541362176669044	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
-22	2719	7541802955802714	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
-2721	3664	7541802982787726	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
-17	1711	7541809595478620	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
-1712	2019	7541809612434877	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
-18	1892	7541813326036369	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
-1893	2262	7541813344794012	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
-20	1969	7541813864899196	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
-1970	2301	7541813884403016	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
+15	1990	7544851114073803	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
+1791	2137	7544847784296136	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
+27	1811	7544851114195513	CMakeFiles/jaden_delapaz_minesweeper.dir/minesweeper.cpp.obj	4e63e997a0b49f2b
+54	3256	7544851802476171	CMakeFiles/jaden_delapaz_minesweeper.dir/minesweeper.cpp.obj	4e63e997a0b49f2b
+34	3524	7544851802281705	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
+34	3371	7544852653524485	CMakeFiles/jaden_delapaz_minesweeper.dir/main.cpp.obj	4f43e3dd65922098
+57	3383	7544852653803581	CMakeFiles/jaden_delapaz_minesweeper.dir/minesweeper.cpp.obj	4e63e997a0b49f2b
+3409	3964	7544852687322061	jaden_delapaz_minesweeper.exe	febc5930d70b0d9
