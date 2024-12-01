@@ -98,7 +98,6 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
     bool isPaused = false;
     Button pauseButton;
     Button leaderboardButton;
-    Tile gameTile;
     Board gameBoard(columns, rows, mine_count);
 
     // Game Window
@@ -132,7 +131,6 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
 
 
     gameTileSprite.setTexture(gameTileTexture);
-    gameTile.setTexture(gameTileTexture);
     happyFaceSprite.setTexture(happyFaceTexture);
     happyFaceSprite.setPosition((columns / 2.0 * 32) - 32, 32 * (rows + 0.5));
     debugSprite.setTexture(debugTexture);
@@ -147,14 +145,12 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
     gameBoard.fillBoard(rows, columns);
     gameBoard.numberBoard(rows, columns);
     gameBoard.printBoard(rows, columns);
-    std::cout << std::endl;
-    gameBoard.revealBoard(rows, columns);
-    gameBoard.printBoard(rows, columns);
 
     for(int row = 0; row < rows; row++) {
         for(int col = 0; col < columns; col++) {
-            gameTile.setPosition(col * 32, row * 32);
-            gameWindow.draw(gameTileSprite);
+            Tile& gameTile = gameBoard.getBoardTile(row, col);
+            gameTile.setPosition(col*32, row*32);
+            gameWindow.draw(gameTile.getSprite());
         }
     }
 
@@ -180,6 +176,7 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
                         pauseButton.setBtnTexture(playTexture);
                         isPaused = true;
                     }
+
                     else if (isPaused) {
                         pauseButton.setBtnTexture(pauseTexture);
                         isPaused = false;
@@ -191,14 +188,25 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
                     std::cout << "leaderboard pressed" << std::endl;
                     leaderboardScreen(columns, rows);
                 }
+                for(int row = 0; row < rows; row++) {
+                    for(int col = 0; col < columns; col++) {
+                        // Tile& gameTile = gameBoard.getBoardTile(row, col);
+                        if(gameBoard.getBoardTile(row,col).isClicked(gameEvent.mouseButton.x, gameEvent.mouseButton.y)) {
+                            gameBoard.revealTile(row,col);
+                            std::cout << "Tile at position (" << row << "," << col << ") was clicked" << std::endl;
+                        }
+                    }
+                }
+
             }
         }
         gameWindow.clear(gameBackground);
 
         for(int row = 0; row < rows; row++) {
             for(int col = 0; col < columns; col++) {
-                gameTileSprite.setPosition(col * 32, row * 32);
-                gameWindow.draw(gameTileSprite);
+                Tile& gameTile = gameBoard.getBoardTile(row, col);
+                gameTile.setPosition(col*32, row*32);
+                gameWindow.draw(gameTile.getSprite());
             }
         }
 
@@ -299,10 +307,7 @@ void Tile::setTile(int type) {
         case 0:
             this->texture.loadFromFile("images/tile_hidden.png");
             break;
-        case 1:
-            this->texture.loadFromFile("images/tile_revealed.png");
-            break;
-        case -1:
+        case 9:
             this->texture.loadFromFile("images/mine.png");
             break;
         default:
@@ -325,7 +330,25 @@ bool Tile::isFlagged() {
 }
 
 void Tile::reveal() {
-    this->shown = true;
+    if(shown) {
+        std::cout << "already revealed!" << std::endl;
+    }
+    if(!shown) {
+        shown = true;
+        std::cout << "revealed" << std::endl;
+        switch(type) {
+            case 0:
+                texture.loadFromFile("images/tile_revealed.png");
+                break;
+            case 9:
+                texture.loadFromFile("images/mine.png");
+                break;
+            default:
+                texture.loadFromFile("images/tile_revealed.png");
+                break;
+        }
+        sprite.setTexture(texture);
+    }
 }
 
 void Tile::flag() {
@@ -348,6 +371,21 @@ void Tile::setPosition(float xPosition, float yPosition) {
     this->sprite.setPosition(xPosition, yPosition);
 }
 
+bool Tile::isClicked(float mouseXPosition, float mouseYPosition) {
+    sf::FloatRect tileClick = this->sprite.getGlobalBounds();
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if(tileClick.contains(mouseXPosition, mouseYPosition)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const sf::Vector2f Tile::getPosition() {
+    return sprite.getPosition();
+}
+
+
 
 // Board class implementation
 void Board::fillBoard(int rows, int columns) {
@@ -355,7 +393,7 @@ void Board::fillBoard(int rows, int columns) {
     int placedMines = 0;
     for(int row = 0; row < rows; row++) {
         for(int col = 0; col < columns; col++) {
-            if(tiles[row][col].getTile() != -1) {
+            if(tiles[row][col].getTile() != 9) {
                 tiles[row][col].setTile(0);
             }
         }
@@ -363,8 +401,8 @@ void Board::fillBoard(int rows, int columns) {
     while(placedMines < mines) {
         int row = std::rand() % rows;
         int col = std::rand() % columns;
-        if(tiles[row][col].getTile() != -1) {
-            tiles[row][col].setTile(-1);
+        if(tiles[row][col].getTile() != 9) {
+            tiles[row][col].setTile(9);
             placedMines++;
         }
     }
@@ -373,7 +411,7 @@ void Board::fillBoard(int rows, int columns) {
 void Board::numberBoard(int rows, int columns) {
     for(int row = 0; row < rows; row++) {
         for(int col = 0; col < columns; col++) {
-            if(tiles[row][col].getTile() == -1) {
+            if(tiles[row][col].getTile() == 9) {
                 continue;
             }
             int surroundingMines = 0;
@@ -384,7 +422,7 @@ void Board::numberBoard(int rows, int columns) {
                     int rowPos = row + i;
                     int colPos = col + j;
                     if(rowPos >= 0 && rowPos < rows && colPos >= 0 && colPos < columns) {
-                        if(tiles[rowPos][colPos].getTile() == -1) {
+                        if(tiles[rowPos][colPos].getTile() == 9) {
                             surroundingMines++;
                         }
                     }
@@ -414,19 +452,25 @@ int Board::revealTile(int row, int col) {
     }
     tile.reveal();
     // Check if the revealed tile is a mine
-    if(tile.getTile() == -1) {
+    if(tile.getTile() == 9) {
         return -1;
     }
     // Recursively check other tiles
     if(tile.getTile() == 0) {
         for(int i = -1; i <= 1; i++) {
             for(int j = -1; j <= 1; j++) {
-                int rowPos = row + i;
-                int colPos = col + j;
                 // check if i and j are 0, which it is the current tile so we should skip it
                 if(i == 0 && j == 0) {
-                    revealTile(rowPos, colPos);
+                    continue;
                 }
+
+                int rowPos = row + i;
+                int colPos = col + j;
+                // Out of bounds, helps for recursive calls
+                if(rowPos < 0 || colPos < 0 || rowPos >= height || colPos >= width) {
+                    continue;
+                }
+                revealTile(rowPos, colPos);
             }
         }
     }
@@ -455,3 +499,10 @@ void Board::printBoard(int rows, int columns) {
         std::cout << std::endl;
     }
 }
+
+Tile& Board::getBoardTile(int row, int column) {
+    return tiles[row][column];
+}
+
+
+// Number class

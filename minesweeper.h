@@ -98,6 +98,8 @@ public:
     void flag();
     void unflag();
     void resetTile();
+    bool isClicked(float xPosition, float yPosition);
+    const sf::Vector2f getPosition();
 };
 
 class Board {
@@ -118,6 +120,7 @@ public:
     void resetBoard(int rows, int columns);
     void endGame(int rows, int columns);
     void printBoard(int rows, int columns);
+    Tile& getBoardTile(int row, int column);
 };
 
 #endif //MINESWEEPER_H
