@@ -146,6 +146,7 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
     gameBoard.numberBoard(rows, columns);
     gameBoard.printBoard(rows, columns);
 
+
     for(int row = 0; row < rows; row++) {
         for(int col = 0; col < columns; col++) {
             Tile& gameTile = gameBoard.getBoardTile(row, col);
@@ -330,15 +331,35 @@ bool Tile::isFlagged() {
 }
 
 void Tile::reveal() {
-    if(shown) {
-        std::cout << "already revealed!" << std::endl;
-    }
-    if(!shown) {
+    if(!isRevealed()) {
         shown = true;
-        std::cout << "revealed" << std::endl;
         switch(type) {
             case 0:
                 texture.loadFromFile("images/tile_revealed.png");
+                break;
+            case 1:
+                texture.loadFromFile("images/number_1.png");
+                break;
+            case 2:
+                texture.loadFromFile("images/number_2.png");
+                break;
+            case 3:
+                texture.loadFromFile("images/number_3.png");
+                break;
+            case 4:
+                texture.loadFromFile("images/number_4.png");
+                break;
+            case 5:
+                texture.loadFromFile("images/number_5.png");
+                break;
+            case 6:
+                texture.loadFromFile("images/number_6.png");
+                break;
+            case 7:
+                texture.loadFromFile("images/number_7.png");
+                break;
+            case 8:
+                texture.loadFromFile("images/number_8.png");
                 break;
             case 9:
                 texture.loadFromFile("images/mine.png");
@@ -447,10 +468,15 @@ int Board::revealTile(int row, int col) {
         return -1;
     }
     Tile& tile = tiles[row][col];
+    std::cout << "Tile at (" << 0 << ", " << 0 << ") has a number of " << tile.getTile() << std::endl;
+    std::cout << tile.isRevealed() << std::endl;
+
     if(tile.isRevealed()) {
         return tile.getTile();
     }
     tile.reveal();
+    std::cout << "Tile at (" << row << ", " << col << ") revealed\n"; // Debug line
+
     // Check if the revealed tile is a mine
     if(tile.getTile() == 9) {
         return -1;

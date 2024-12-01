@@ -86,7 +86,7 @@ private:
     sf::Texture texture;
 public:
     Tile(){}
-    Tile(int type, bool shown, bool flagged) : type(type), shown(shown), flagged(flagged) {}
+    Tile(int type, bool shown, bool flagged) : type(type), shown(false), flagged(flagged) {}
     void setTile(int type);
     void setTexture(sf::Texture &texture);
     void setPosition(float xPosition, float yPosition);
