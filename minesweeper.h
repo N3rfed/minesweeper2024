@@ -13,6 +13,7 @@ void setText(sf::Text &text, float x, float y);
 void runWelcomeScreen(int& columns, int& rows, int& width, int& height, int& mine_count);
 void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_count);
 void leaderboardScreen(int& columns, int& rows);
+void renderWithLayers(const sf::Sprite& background, const sf::Sprite& foreground);
 
 class Button {
 private:
@@ -82,23 +83,29 @@ private:
     int type;
     bool shown;
     bool flagged;
-    sf::Sprite sprite;
+    sf::Sprite foregroundSprite;
+    sf::Sprite backgroundSprite;
     sf::Texture texture;
+    sf::Texture backgroundTexture;
 public:
     Tile(){}
     Tile(int type, bool shown, bool flagged) : type(type), shown(false), flagged(flagged) {}
     void setTile(int type);
     void setTexture(sf::Texture &texture);
+    void setBackgroundTexture(sf::Texture &texture);
     void setPosition(float xPosition, float yPosition);
     int getTile();
     sf::Sprite& getSprite();
+    sf::Sprite& getBackgroundSprite();
     bool isRevealed();
     bool isFlagged();
     void reveal();
+    void hide();
     void flag();
     void unflag();
     void resetTile();
     bool isClicked(float xPosition, float yPosition);
+    bool isRightClicked(float mouseXPosition, float mouseYPosition);
     const sf::Vector2f getPosition();
 };
 

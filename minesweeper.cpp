@@ -9,6 +9,7 @@ void setText(sf::Text &text, float x, float y){
     text.setPosition(sf::Vector2f(x, y));
 }
 
+
 void runWelcomeScreen(int& columns, int& rows, int& width, int& height, int& mine_count) {
     // Welcome Window
     sf::RenderWindow welcomeWindow(sf::VideoMode(width, height), "Minesweeper");
@@ -113,26 +114,27 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
     sf::Texture pauseTexture;
     sf::Texture leaderboardTexture;
     sf::Texture playTexture;
+    sf::Texture revealedTileTexture;
 
-    if(!gameTileTexture.loadFromFile("images\\tile_hidden.png") ||
-        !happyFaceTexture.loadFromFile("images\\face_happy.png") ||
-        !debugTexture.loadFromFile("images\\debug.png") ||
-        !pauseTexture.loadFromFile("images\\pause.png") ||
-        !playTexture.loadFromFile("images\\play.png") ||
-        !leaderboardTexture.loadFromFile("images\\leaderboard.png")) {
+    if(!gameTileTexture.loadFromFile("images/tile_hidden.png") ||
+        !gameTileTexture.loadFromFile("images/tile_revealed.png") ||
+        !happyFaceTexture.loadFromFile("images/face_happy.png") ||
+        !debugTexture.loadFromFile("images/debug.png") ||
+        !pauseTexture.loadFromFile("images/pause.png") ||
+        !playTexture.loadFromFile("images/play.png") ||
+        !leaderboardTexture.loadFromFile("images/leaderboard.png")) {
         std::cerr << "ERROR LOADING TILE_FILE" << std::endl;
     }
-    // else {
-    //     std::cout << "success" << std::endl;
-    // }
     sf::Sprite gameTileSprite;
     sf::Sprite happyFaceSprite;
     sf::Sprite debugSprite;
     sf::Sprite leaderboardSprite;
+    sf::Sprite revealedTileSprite;
 
 
 
     gameTileSprite.setTexture(gameTileTexture);
+    revealedTileSprite.setTexture(revealedTileTexture);
     resetButton.setBtnTexture(happyFaceTexture);
     resetButton.setBtnPosition((columns / 2.0 * 32) - 32, 32 * (rows + 0.5));
     debugButton.setBtnTexture(debugTexture);
@@ -149,12 +151,18 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
     gameBoard.printBoard(rows, columns);
     gameBoard.resetBoard(rows, columns);
 
-
+    // for(int row = 0; row < rows; row++) {
+    //     for(int col = 0; col < columns; col++) {
+    //         revealedTileSprite.setPosition(col*32, row*32);
+    //         gameWindow.draw(revealedTileSprite);
+    //     }
+    // }
 
     for(int row = 0; row < rows; row++) {
         for(int col = 0; col < columns; col++) {
             Tile& gameTile = gameBoard.getBoardTile(row, col);
             gameTile.setPosition(col*32, row*32);
+            gameWindow.draw(gameTile.getBackgroundSprite());
             gameWindow.draw(gameTile.getSprite());
         }
     }
@@ -208,6 +216,15 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
                             gameBoard.revealTile(row,col);
                             std::cout << "Tile at position (" << row << "," << col << ") was clicked" << std::endl;
                         }
+                        if(gameBoard.getBoardTile(row,col).isRightClicked(gameEvent.mouseButton.x, gameEvent.mouseButton.y)) {
+                            if(!gameBoard.getBoardTile(row, col).isFlagged()) {
+                                gameBoard.getBoardTile(row,col).flag();
+                            }
+                            else {
+                                gameBoard.getBoardTile(row,col).unflag();
+                            }
+                            std::cout << "Tile at position (" << row << "," << col << ") was clicked" << std::endl;
+                        }
                     }
                 }
 
@@ -215,10 +232,18 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
         }
         gameWindow.clear(gameBackground);
 
+        // for(int row = 0; row < rows; row++) {
+        //     for(int col = 0; col < columns; col++) {
+        //         revealedTileSprite.setPosition(col*32, row*32);
+        //         gameWindow.draw(revealedTileSprite);
+        //     }
+        // }
+
         for(int row = 0; row < rows; row++) {
             for(int col = 0; col < columns; col++) {
                 Tile& gameTile = gameBoard.getBoardTile(row, col);
                 gameTile.setPosition(col*32, row*32);
+                gameWindow.draw(gameTile.getBackgroundSprite());
                 gameWindow.draw(gameTile.getSprite());
             }
         }
@@ -307,17 +332,28 @@ sf::Sprite& Button::getSprite() {
 
 // Tile class implementation
 void Tile::setTexture(sf::Texture &texture) {
-    this->sprite.setTexture(texture);
+    this->foregroundSprite.setTexture(texture);
+}
+
+void Tile::setBackgroundTexture(sf::Texture &texture) {
+    this->backgroundSprite.setTexture(texture);
 }
 
 sf::Sprite& Tile::getSprite() {
-    return this->sprite;
+    return this->foregroundSprite;
 }
+
+sf::Sprite &Tile::getBackgroundSprite() {
+    return this->backgroundSprite;
+}
+
 
 void Tile::setTile(int type) {
     this->type = type;
+    this->backgroundTexture.loadFromFile("images/tile_revealed.png");
     this->texture.loadFromFile("images/tile_hidden.png");
-    this->sprite.setTexture(this->texture);
+    this->foregroundSprite.setTexture(this->texture);
+    this->backgroundSprite.setTexture(this->backgroundTexture);
 }
 
 int Tile::getTile() {
@@ -335,6 +371,8 @@ bool Tile::isFlagged() {
 void Tile::reveal() {
     if(!isRevealed()) {
         shown = true;
+        backgroundTexture.loadFromFile("images/tile_revealed.png");
+        backgroundSprite.setTexture(backgroundTexture);
         switch(type) {
             case 0:
                 texture.loadFromFile("images/tile_revealed.png");
@@ -367,20 +405,33 @@ void Tile::reveal() {
                 texture.loadFromFile("images/mine.png");
                 break;
             default:
-                texture.loadFromFile("images/tile_revealed.png");
                 break;
         }
-        sprite.setTexture(texture);
+        foregroundSprite.setTexture(texture);
+    }
+}
+void Tile::hide() {
+    this->shown = false;
+    this->texture.loadFromFile("images/tile_hidden.png");
+    this->foregroundSprite.setTexture(this->texture);
+}
+
+
+void Tile::flag() {
+    if(!this->shown && !this->flagged) {
+        flagged = true;
+        backgroundTexture.loadFromFile("images/tile_hidden.png");
+        texture.loadFromFile("images/flag.png");
+        backgroundSprite.setTexture(backgroundTexture);
+        foregroundSprite.setTexture(texture);
     }
 }
 
-void Tile::flag() {
-    this->flagged = true;
-}
-
 void Tile::unflag() {
-    if(!this->shown) {
-        this->flagged = false;
+    if(!this->shown && this->flagged) {
+        flagged = false;
+        texture.loadFromFile("images/tile_hidden.png");
+        foregroundSprite.setTexture(texture);
     }
 }
 
@@ -391,12 +442,25 @@ void Tile::resetTile() {
 }
 
 void Tile::setPosition(float xPosition, float yPosition) {
-    this->sprite.setPosition(xPosition, yPosition);
+    this->backgroundSprite.setPosition(xPosition, yPosition);
+    this->foregroundSprite.setPosition(xPosition, yPosition);
 }
 
 bool Tile::isClicked(float mouseXPosition, float mouseYPosition) {
-    sf::FloatRect tileClick = this->sprite.getGlobalBounds();
-    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+    sf::FloatRect tileClick = this->foregroundSprite.getGlobalBounds();
+    if(!flagged) {
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            if(tileClick.contains(mouseXPosition, mouseYPosition)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Tile::isRightClicked(float mouseXPosition, float mouseYPosition) {
+    sf::FloatRect tileClick = this->foregroundSprite.getGlobalBounds();
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
         if(tileClick.contains(mouseXPosition, mouseYPosition)) {
             return true;
         }
@@ -404,11 +468,10 @@ bool Tile::isClicked(float mouseXPosition, float mouseYPosition) {
     return false;
 }
 
+
 const sf::Vector2f Tile::getPosition() {
-    return sprite.getPosition();
+    return foregroundSprite.getPosition();
 }
-
-
 
 // Board class implementation
 void Board::fillBoard(int rows, int columns) {
@@ -536,15 +599,17 @@ Tile& Board::getBoardTile(int rows, int columns) {
 }
 
 void Board::debugBoard(int rows, int columns, int type) {
+    static bool debugState = false;
+    debugState = !debugState;
     for(int row = 0; row < rows; row++) {
         for(int col = 0; col < columns; col++) {
             type = tiles[row][col].getTile();
             if(type == 9) {
-                if(!tiles[row][col].isRevealed()) {
+                if(debugState) {
                     tiles[row][col].reveal();
                 }
                 else {
-                    tiles[row][col].setTile(0);
+                    tiles[row][col].hide();
                 }
             }
         }
