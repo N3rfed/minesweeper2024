@@ -473,6 +473,33 @@ const sf::Vector2f Tile::getPosition() {
     return foregroundSprite.getPosition();
 }
 
+void Tile::toggleDebug() {
+    debug = !debug;
+    if(debug) {
+        backgroundTexture.loadFromFile("images/tile_hidden.png");
+        backgroundSprite.setTexture(backgroundTexture);
+        if (type == 9) {
+            texture.loadFromFile("images/mine.png");
+            foregroundSprite.setTexture(texture);
+        }
+    }
+    else {
+        if(type == 9) {
+            if(flagged) {
+                backgroundTexture.loadFromFile("images/tile_hidden.png");
+                texture.loadFromFile("images/flag.png");
+                backgroundSprite.setTexture(backgroundTexture);
+                foregroundSprite.setTexture(texture);
+            }
+            else {
+                texture.loadFromFile("images/tile_hidden.png");
+                foregroundSprite.setTexture(texture);
+            }
+        }
+    }
+}
+
+
 // Board class implementation
 void Board::fillBoard(int rows, int columns) {
     // insert random placement
@@ -605,12 +632,7 @@ void Board::debugBoard(int rows, int columns, int type) {
         for(int col = 0; col < columns; col++) {
             type = tiles[row][col].getTile();
             if(type == 9) {
-                if(debugState) {
-                    tiles[row][col].reveal();
-                }
-                else {
-                    tiles[row][col].hide();
-                }
+                tiles[row][col].toggleDebug();
             }
         }
     }

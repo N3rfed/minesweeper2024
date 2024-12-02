@@ -83,6 +83,7 @@ private:
     int type;
     bool shown;
     bool flagged;
+    bool debug;
     sf::Sprite foregroundSprite;
     sf::Sprite backgroundSprite;
     sf::Texture texture;
@@ -107,6 +108,7 @@ public:
     bool isClicked(float xPosition, float yPosition);
     bool isRightClicked(float mouseXPosition, float mouseYPosition);
     const sf::Vector2f getPosition();
+    void toggleDebug();
 };
 
 class Board {
