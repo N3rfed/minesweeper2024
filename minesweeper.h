@@ -9,10 +9,12 @@
 #include <SFML/Graphics.hpp>
 #include <fstream>
 #include <algorithm>
+class Board;
+
 void setText(sf::Text &text, float x, float y);
 void runWelcomeScreen(int& columns, int& rows, int& width, int& height, int& mine_count);
 void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_count);
-void leaderboardScreen(int& columns, int& rows);
+void leaderboardScreen(int& columns, int& rows, Board* board);
 void renderWithLayers(const sf::Sprite& background, const sf::Sprite& foreground);
 
 class Button {
@@ -47,9 +49,10 @@ private:
     int width;
     int height;
     std::vector<Player> players;
+    Board* currentGameBoard;
 public:
     Leaderboard(){}
-    Leaderboard(int width, int height) : width(width), height(height) {}
+    Leaderboard(Board* currentGameBoard, int width, int height) : width(width), height(height), currentGameBoard(currentGameBoard) {}
     void addWinner(int time, std::string name);
 };
 
@@ -88,6 +91,9 @@ private:
     sf::Sprite backgroundSprite;
     sf::Texture texture;
     sf::Texture backgroundTexture;
+    bool savedShown;
+    bool savedFlagged;
+    int savedType;
 public:
     Tile(){}
     Tile(int type, bool shown, bool flagged) : type(type), shown(false), flagged(flagged) {}
@@ -109,6 +115,9 @@ public:
     bool isRightClicked(float mouseXPosition, float mouseYPosition);
     const sf::Vector2f getPosition();
     void toggleDebug();
+    bool isDebugged();
+    void pause();
+    void resume();
 };
 
 class Board {
@@ -116,6 +125,7 @@ private:
     int width;
     int height;
     int mines;
+    int tilesRevealed;
     std::vector <std::vector<Tile>> tiles;
 public:
     Board(){}
@@ -131,6 +141,11 @@ public:
     void printBoard(int rows, int columns);
     Tile& getBoardTile(int rows, int columns);
     void debugBoard(int rows, int columns, int type);
+    void gameLoss(int rows, int columns);
+    void gameWon(int rows, int columns);
+    int getTilesRevealed();
+    void pauseBoard(int rows, int columns);
+    void resumeBoard(int rows, int columns);
 };
 
 #endif //MINESWEEPER_H
