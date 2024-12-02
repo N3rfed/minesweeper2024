@@ -98,6 +98,8 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
     bool isPaused = false;
     Button pauseButton;
     Button leaderboardButton;
+    Button resetButton;
+    Button debugButton;
     Board gameBoard(columns, rows, mine_count);
 
     // Game Window
@@ -131,10 +133,10 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
 
 
     gameTileSprite.setTexture(gameTileTexture);
-    happyFaceSprite.setTexture(happyFaceTexture);
-    happyFaceSprite.setPosition((columns / 2.0 * 32) - 32, 32 * (rows + 0.5));
-    debugSprite.setTexture(debugTexture);
-    debugSprite.setPosition(columns * 32 - 304, 32 * (rows + 0.5));
+    resetButton.setBtnTexture(happyFaceTexture);
+    resetButton.setBtnPosition((columns / 2.0 * 32) - 32, 32 * (rows + 0.5));
+    debugButton.setBtnTexture(debugTexture);
+    debugButton.setBtnPosition(columns * 32 - 304, 32 * (rows + 0.5));
     pauseButton.setBtnTexture(pauseTexture);
     pauseButton.setBtnPosition(columns * 32 - 240, 32 * (rows + 0.5));
     leaderboardButton.setBtnTexture(leaderboardTexture);
@@ -145,6 +147,8 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
     gameBoard.fillBoard(rows, columns);
     gameBoard.numberBoard(rows, columns);
     gameBoard.printBoard(rows, columns);
+    gameBoard.resetBoard(rows, columns);
+
 
 
     for(int row = 0; row < rows; row++) {
@@ -155,8 +159,8 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
         }
     }
 
-    gameWindow.draw(happyFaceSprite);
-    gameWindow.draw(debugSprite);
+    gameWindow.draw(resetButton.getSprite());
+    gameWindow.draw(debugButton.getSprite());
     gameWindow.draw(pauseButton.getSprite());
     gameWindow.draw(leaderboardButton.getSprite());
 
@@ -185,9 +189,17 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
                     gameWindow.clear(gameBackground);
                     gameWindow.draw(pauseButton.getSprite());
                 }
+                if(resetButton.isBtnPressed(gameEvent.mouseButton.x, gameEvent.mouseButton.y)) {
+                    gameBoard.resetBoard(rows, columns);
+                    std::cout << "reset button pressed" << std::endl;
+                }
                 if(leaderboardButton.isBtnPressed(gameEvent.mouseButton.x, gameEvent.mouseButton.y)) {
                     std::cout << "leaderboard pressed" << std::endl;
                     leaderboardScreen(columns, rows);
+                }
+                if(debugButton.isBtnPressed(gameEvent.mouseButton.x, gameEvent.mouseButton.y)) {
+                    gameBoard.debugBoard(rows, columns, 9);
+                    std::cout << "debug pressed" << std::endl;
                 }
                 for(int row = 0; row < rows; row++) {
                     for(int col = 0; col < columns; col++) {
@@ -211,8 +223,8 @@ void runGameScreen(int& columns, int& rows, int& width, int& height, int& mine_c
             }
         }
 
-        gameWindow.draw(happyFaceSprite);
-        gameWindow.draw(debugSprite);
+        gameWindow.draw(resetButton.getSprite());
+        gameWindow.draw(debugButton.getSprite());
         gameWindow.draw(pauseButton.getSprite());
         gameWindow.draw(leaderboardButton.getSprite());
 
@@ -304,17 +316,7 @@ sf::Sprite& Tile::getSprite() {
 
 void Tile::setTile(int type) {
     this->type = type;
-    switch(type) {
-        case 0:
-            this->texture.loadFromFile("images/tile_hidden.png");
-            break;
-        case 9:
-            this->texture.loadFromFile("images/mine.png");
-            break;
-        default:
-            this->texture.loadFromFile("images/tile_hidden.png");
-            break;
-    }
+    this->texture.loadFromFile("images/tile_hidden.png");
     this->sprite.setTexture(this->texture);
 }
 
@@ -383,9 +385,9 @@ void Tile::unflag() {
 }
 
 void Tile::resetTile() {
+    this->type = 0;
     this->shown = false;
     this->flagged = false;
-    this->type = 0;
 }
 
 void Tile::setPosition(float xPosition, float yPosition) {
@@ -468,14 +470,14 @@ int Board::revealTile(int row, int col) {
         return -1;
     }
     Tile& tile = tiles[row][col];
-    std::cout << "Tile at (" << 0 << ", " << 0 << ") has a number of " << tile.getTile() << std::endl;
-    std::cout << tile.isRevealed() << std::endl;
+    // std::cout << "Tile at (" << row << ", " << col << ") has a number of " << tile.getTile() << std::endl;
+    // std::cout << tile.isRevealed() << " is the current revealed state" << std::endl;
 
     if(tile.isRevealed()) {
         return tile.getTile();
     }
     tile.reveal();
-    std::cout << "Tile at (" << row << ", " << col << ") revealed\n"; // Debug line
+    // std::cout << "Tile at (" << row << ", " << col << ") revealed\n"; // Debug line
 
     // Check if the revealed tile is a mine
     if(tile.getTile() == 9) {
@@ -504,13 +506,15 @@ int Board::revealTile(int row, int col) {
 }
 
 void Board::resetBoard(int rows, int columns) {
-    for(int row  = 0; rows < rows; row++) {
+    for(int row  = 0; row < rows; row++) {
         for(int col = 0; col < columns; col++) {
+            // std::cout << "tile at position (" << row << ", " << col << ") was reset" << std::endl;
             tiles[row][col].resetTile();
         }
     }
     fillBoard(rows, columns);
     numberBoard(rows, columns);
+    printBoard(rows, columns);
 }
 
 void Board::endGame(int rows, int columns) {
@@ -524,10 +528,27 @@ void Board::printBoard(int rows, int columns) {
         }
         std::cout << std::endl;
     }
+    std::cout << std::endl;
 }
 
-Tile& Board::getBoardTile(int row, int column) {
-    return tiles[row][column];
+Tile& Board::getBoardTile(int rows, int columns) {
+    return tiles[rows][columns];
+}
+
+void Board::debugBoard(int rows, int columns, int type) {
+    for(int row = 0; row < rows; row++) {
+        for(int col = 0; col < columns; col++) {
+            type = tiles[row][col].getTile();
+            if(type == 9) {
+                if(!tiles[row][col].isRevealed()) {
+                    tiles[row][col].reveal();
+                }
+                else {
+                    tiles[row][col].setTile(0);
+                }
+            }
+        }
+    }
 }
 
 

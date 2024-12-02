@@ -120,7 +120,8 @@ public:
     void resetBoard(int rows, int columns);
     void endGame(int rows, int columns);
     void printBoard(int rows, int columns);
-    Tile& getBoardTile(int row, int column);
+    Tile& getBoardTile(int rows, int columns);
+    void debugBoard(int rows, int columns, int type);
 };
 
 #endif //MINESWEEPER_H
